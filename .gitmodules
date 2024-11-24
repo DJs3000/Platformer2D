@@ -1,6 +1,0 @@
-[submodule "lib/sdl2"]
-	path = lib/sdl2
-	url = https://github.com/libsdl-org/SDL.git
-[submodule "lib/tileengine"]
-	path = lib/tileengine
-	url = https://github.com/megamarc/Tilengine.git
