@@ -4,6 +4,7 @@
 #include "utils.hpp"
 
 #include <cstdint>
+#include <entt/entity/registry.hpp>
 
 namespace {
 
@@ -20,12 +21,14 @@ struct GameScene final {
 
     TLN_Sequence idle_sequence = {};
     TLN_Sequence skip_sequence = {};
+    TLN_Sequence knight_sequence = {}; 
 
     unsigned int world_width  = {};
     unsigned int world_height = {};
     unsigned int camera_x     = {};
 
-    Player       player       = {};
+    Player       player           = {};
+    entt::registry scene_registry = {};
 };
 
 [[nodiscard]] GameScene InitScene(const Platformer2D::Resources &resources);     
@@ -108,6 +111,17 @@ bool SetupSequences(GameScene &scene, const Platformer2D::Resources &resources)
         DestroyScene(scene);
         return false;
     }
+
+    scene.knight_sequence = TLN_CreateSpriteSequence(nullptr,
+                                                     resources.getSpriteset("knight_idle"),
+                                                     "knight_idle-",
+                                                     sequence_delay);
+    if (scene.knight_sequence == nullptr) {
+        Platformer2D::LogLastError();
+        DestroyScene(scene);
+        return false;
+    }
+
     return true;
 }
 
@@ -115,21 +129,21 @@ bool SetupPlayer(GameScene &scene, const Platformer2D::Resources &resources)
 {
     constexpr unsigned int  sprite_index              = 0;
     constexpr unsigned int  loop                      = 0;
-    constexpr unsigned int  initial_player_position_x = 48;
-    constexpr unsigned int  initial_player_position_y = 144;
+    constexpr unsigned int  initial_player_position_x = 30;
+    constexpr unsigned int  initial_player_position_y = 100;
     constexpr std::uint32_t flags                     = 0;
 
     scene.player.x = initial_player_position_x;
     scene.player.y = initial_player_position_y; 
 
-	bool result = TLN_ConfigSprite(sprite_index, resources.getSpriteset("atlas"), flags);
+	bool result = TLN_ConfigSprite(sprite_index, resources.getSpriteset("knight_idle"), flags);
     if (result == false) {
         Platformer2D::LogLastError();
         DestroyScene(scene);
         return false;
     }
 
-	result = TLN_SetSpriteAnimation(sprite_index, scene.idle_sequence, loop);
+	result = TLN_SetSpriteAnimation(sprite_index, scene.knight_sequence, loop);
     if (result == false) {
         Platformer2D::LogLastError();
         DestroyScene(scene);
@@ -157,8 +171,7 @@ void RunScene(GameScene &scene, const Platformer2D::Resources &resources)
 		else if (TLN_GetInput(INPUT_RIGHT) && scene.camera_x < scene.world_width - TLN_GetWidth())
 			scene.camera_x += 3;
 
-		if (scene.camera_x != old_camera_x)
-		{
+		if (scene.camera_x != old_camera_x) {
 			TLN_SetWorldPosition(scene.camera_x, 0);
 			old_camera_x = scene.camera_x;
 		}

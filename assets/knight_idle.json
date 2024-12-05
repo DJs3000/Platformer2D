@@ -1,0 +1,80 @@
+{"frames": [
+{
+  "filename": "knight_idle-0",
+  "frame": {"x":0,"y":0,"w":128,"h":64},
+  "rotated": false,
+  "trimmed": false,
+  "spriteSourceSize": {"x":0,"y":0,"w":128,"h":64},
+  "sourceSize": {"w":128,"h":64},
+  "pivot": {"x":0.5,"y":0.5}
+},
+{
+  "filename": "knight_idle-1",
+  "frame": {"x":128,"y":0,"w":128,"h":64},
+  "rotated": false,
+  "trimmed": false,
+  "spriteSourceSize": {"x":0,"y":0,"w":128,"h":64},
+  "sourceSize": {"w":128,"h":64},
+  "pivot": {"x":0.5,"y":0.5}
+},
+{
+  "filename": "knight_idle-2",
+  "frame": {"x":0,"y":64,"w":128,"h":64},
+  "rotated": false,
+  "trimmed": false,
+  "spriteSourceSize": {"x":0,"y":0,"w":128,"h":64},
+  "sourceSize": {"w":128,"h":64},
+  "pivot": {"x":0.5,"y":0.5}
+},
+{
+  "filename": "knight_idle-3",
+  "frame": {"x":128,"y":64,"w":128,"h":64},
+  "rotated": false,
+  "trimmed": false,
+  "spriteSourceSize": {"x":0,"y":0,"w":128,"h":64},
+  "sourceSize": {"w":128,"h":64},
+  "pivot": {"x":0.5,"y":0.5}
+},
+{
+  "filename": "knight_idle-4",
+  "frame": {"x":0,"y":128,"w":128,"h":64},
+  "rotated": false,
+  "trimmed": false,
+  "spriteSourceSize": {"x":0,"y":0,"w":128,"h":64},
+  "sourceSize": {"w":128,"h":64},
+  "pivot": {"x":0.5,"y":0.5}
+},
+{
+  "filename": "knight_idle-5",
+  "frame": {"x":128,"y":128,"w":128,"h":64},
+  "rotated": false,
+  "trimmed": false,
+  "spriteSourceSize": {"x":0,"y":0,"w":128,"h":64},
+  "sourceSize": {"w":128,"h":64},
+  "pivot": {"x":0.5,"y":0.5}
+},
+{
+  "filename": "knight_idle-6",
+  "frame": {"x":0,"y":192,"w":128,"h":64},
+  "rotated": false,
+  "trimmed": false,
+  "spriteSourceSize": {"x":0,"y":0,"w":128,"h":64},
+  "sourceSize": {"w":128,"h":64},
+  "pivot": {"x":0.5,"y":0.5}
+},
+{
+  "filename": "knight_idle-7",
+  "frame": {"x":128,"y":192,"w":128,"h":64},
+  "rotated": false,
+  "trimmed": false,
+  "spriteSourceSize": {"x":0,"y":0,"w":128,"h":64},
+  "sourceSize": {"w":128,"h":64},
+  "pivot": {"x":0.5,"y":0.5}
+}],
+  "meta": {
+	"version": "1.0",
+    "image": "knight_idle.png",
+	"format": "RGBA8888",
+	"size": {"w":128,"h":921}
+  }
+}

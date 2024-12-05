@@ -17,4 +17,4 @@ inline void LogError(const std::string &error)
     std::cerr << error << std::endl;
 }
 
-}
+} // namespace Platformer2D

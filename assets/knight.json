@@ -1,0 +1,19 @@
+{"frames": [
+{
+	"filename": "player-idle/player-idle-1",
+	"frame": {"x":41,"y":611,"w":37,"h":32},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":37,"h":32},
+	"sourceSize": {"w":37,"h":32},
+	"pivot": {"x":0.5,"y":0.5}
+},
+{
+	"filename": "player-idle/player-idle-2",
+	"frame": {"x":80,"y":611,"w":37,"h":32},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":37,"h":32},
+	"sourceSize": {"w":37,"h":32},
+	"pivot": {"x":0.5,"y":0.5}
+}]}
