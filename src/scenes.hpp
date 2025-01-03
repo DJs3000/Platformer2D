@@ -1,16 +1,14 @@
 #pragma once
 
-namespace Platformer2D {
-
-class Resources;
+namespace Scenes {
 
 enum class SceneMessage {
     ERROR,
     EXIT
 };
 
-using Scene = SceneMessage(const Resources&);
+using Scene = SceneMessage ();
 
-[[nodiscard]] SceneMessage RunGameScene(const Resources &resources);
+[[nodiscard]] SceneMessage RunGameScene();
 
-} // namespace Platformer2D 
+}
