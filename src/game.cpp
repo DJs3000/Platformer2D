@@ -1,5 +1,5 @@
 #include "game.hpp"
-#include "resources.hpp"
+#include "resource_manager.hpp"
 #include "error.hpp"
 #include "scenes.hpp"
 
@@ -17,36 +17,41 @@ bool Platformer2D::Init()
                                   sprites, 
                                   pallete_animations);
     if (engine == nullptr) {
-        LogLastError();
+        Error::LogLastError();
         return false;
     }
 
-    const bool is_window_created = TLN_CreateWindow(nullptr, CWF_FULLSCREEN);
-    if (is_window_created == false) {
-        LogLastError();
+    bool result = TLN_CreateWindow(nullptr, CWF_FULLSCREEN);
+    if (result == false) {
+        Error::LogLastError();
+        TLN_Deinit();
+        return false;
+    }
+	TLN_SetLoadPath("assets");
+    result = ResourceManager::Init();
+    if (result == false) {
+        Error::LogLastError();
         TLN_Deinit();
         return false;
     }
 
-	TLN_SetLoadPath("assets");
     TLN_DisableCRTEffect();
     return true;
 }
 
 void Platformer2D::Run()
 {
-    Resources resources     = LoadResources();
-    Scene    *current_scene = RunGameScene;
-    bool      running       = true;
+    Scenes::Scene *current_scene = Scenes::RunGameScene;
+    bool           running       = true;
 
     while(running) {
-        SceneMessage message = current_scene(resources);
+        Scenes::SceneMessage message = current_scene();
         switch(message) {
-        case SceneMessage::ERROR:
-            LogError("Main cycle error in scene");
+        case Scenes::SceneMessage::ERROR:
+            Error::LogError("Main cycle error in scene");
             running = false;
             break;
-        case SceneMessage::EXIT:
+        case Scenes::SceneMessage::EXIT:
             running = false;
             break;
         }
