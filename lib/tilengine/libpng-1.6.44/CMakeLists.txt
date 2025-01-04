@@ -733,7 +733,7 @@ if(PNG_STATIC)
                              PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
   target_include_directories(png_static SYSTEM
                              INTERFACE $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/libpng${PNGLIB_ABI_VERSION}>)
-  target_link_libraries(png_static PUBLIC ZLIB::ZLIB ${M_LIBRARY})
+  target_link_libraries(png_static PUBLIC zlibstatic ${M_LIBRARY})
 endif()
 
 if(PNG_FRAMEWORK AND NOT APPLE)

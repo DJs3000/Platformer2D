@@ -60,6 +60,7 @@ void Platformer2D::Run()
 
 void Platformer2D::Close()
 {
+    ResourceManager::Close();
     TLN_DeleteWindow();
     TLN_Deinit();
 }

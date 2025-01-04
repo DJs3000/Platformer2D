@@ -6,10 +6,12 @@ project(Tilengine)
 set( PNG_SHARED          OFF CACHE BOOL "" FORCE )
 set( PNG_EXECUTABLES     OFF CACHE BOOL "" FORCE )
 
-set( SDL_SHARED  OFF CACHE BOOL "" FORCE )
-set( SDL_TEST    OFF CACHE BOOL "" FORCE )
-set( SDL_STATIC  ON  CACHE BOOL "" FORCE )
-
+set( SDL_SHARED          OFF CACHE BOOL "" FORCE )
+set( SDL_TEST            OFF CACHE BOOL "" FORCE )
+set( ZLIB_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set( SDL_STATIC          ON  CACHE BOOL "" FORCE )
+set( SKIP_INSTALL_ALL ON CACHE BOOL "" FORCE)
+add_subdirectory(zlib-1.3.1)
 add_subdirectory(libpng-1.6.44)
 add_subdirectory(SDL-2.30.9)
 
@@ -28,9 +30,8 @@ elseif (UNIX AND APPLE)
     target_link_libraries(${PROJECT_NAME} PRIVATE "framework")
 endif()
 
-target_link_libraries  ( ${PROJECT_NAME} PRIVATE z)
 target_link_libraries  ( ${PROJECT_NAME} PRIVATE png_static)
-target_link_libraries  ( ${PROJECT_NAME} PRIVATE SDL2::SDL2main SDL2::SDL2-static )
+target_link_libraries  ( ${PROJECT_NAME} PRIVATE SDL2::SDL2-static )
 
 target_include_directories(${PROJECT_NAME} PRIVATE include)
 
@@ -50,4 +51,4 @@ file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/include/Tilengine.h
 #target_link_libraries(Test PRIVATE "m")
 
 # samples
-add_subdirectory(samples)
+#add_subdirectory(samples)

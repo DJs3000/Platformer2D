@@ -1,6 +1,6 @@
 target_sources( main PRIVATE
-    "main.cpp" 
-    "resource_manager.cpp"
-    "game.cpp"
-    "game_scene.cpp"
+    "src/main.cpp" 
+    "src/resource_manager.cpp"
+    "src/game.cpp"
+    "src/game_scene.cpp"
     )
