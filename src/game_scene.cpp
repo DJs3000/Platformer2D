@@ -19,7 +19,6 @@ struct GameScene final {
     };
 
     TLN_Sequence idle_sequence = {};
-    TLN_Sequence skip_sequence = {};
 
     unsigned int world_width  = {};
     unsigned int world_height = {};
@@ -87,24 +86,11 @@ bool SetupSequences(GameScene &scene)
 {
     constexpr unsigned int sequence_delay = 6;
 
-    scene.idle_sequence = TLN_CreateSpriteSequence(nullptr, 
-                                                  ResourceManager::GetSpriteset("atlas"), 
-                                                  "player-idle/player-idle-", 
-                                                  sequence_delay);
+    scene.idle_sequence = ResourceManager::GetSequence("knight_idle", "idle");
     if (scene.idle_sequence == nullptr) {
         Error::LogLastError();
         DestroyScene(scene);
         return false; 
-    }
-
-    scene.skip_sequence = TLN_CreateSpriteSequence(nullptr, 
-                                                  ResourceManager::GetSpriteset("atlas"), 
-                                                  "player-skip/player-skip-", 
-                                                  sequence_delay);
-    if (scene.skip_sequence == nullptr) {
-        Error::LogLastError();
-        DestroyScene(scene);
-        return false;
     }
     return true;
 }
@@ -113,14 +99,14 @@ bool SetupPlayer(GameScene &scene)
 {
     constexpr unsigned int  sprite_index              = 0;
     constexpr unsigned int  loop                      = 0;
-    constexpr unsigned int  initial_player_position_x = 48;
-    constexpr unsigned int  initial_player_position_y = 144;
+    constexpr unsigned int  initial_player_position_x = 28;
+    constexpr unsigned int  initial_player_position_y = 114;
     constexpr std::uint32_t flags                     = 0;
 
     scene.player.x = initial_player_position_x;
     scene.player.y = initial_player_position_y; 
 
-	bool result = TLN_ConfigSprite(sprite_index, ResourceManager::GetSpriteset("atlas"), flags);
+	bool result = TLN_ConfigSprite(sprite_index, ResourceManager::GetSpriteset("knight_idle"), flags);
     if (result == false) {
         Error::LogLastError();
         DestroyScene(scene);
@@ -168,8 +154,6 @@ void DestroyScene(GameScene &scene)
     TLN_ReleaseWorld();
     if (scene.idle_sequence != nullptr)
         Utils::TryDeleteSequence(scene.idle_sequence);
-    if (scene.skip_sequence != nullptr)
-        Utils::TryDeleteSequence(scene.skip_sequence);
 }
 
 } // namespace
