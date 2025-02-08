@@ -12,4 +12,11 @@ namespace ResourceManager {
     [[nodiscard]] TLN_Spriteset GetSpriteset(const std::string &name);
     [[nodiscard]] TLN_Sequence GetSequence(const std::string &sequence_pack,
                                            const std::string &name);
+
+    [[nodiscard]] inline unsigned int GenerateSpriteIndex() noexcept
+    {
+        static unsigned int sprite_id;
+        ++sprite_id;
+        return sprite_id;
+    }
 }

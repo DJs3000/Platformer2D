@@ -2,6 +2,7 @@
 #include "resource_manager.hpp"
 #include "error.hpp"
 #include "utils.hpp"
+#include "player.hpp"
 
 #include <cstdint>
 
@@ -13,24 +14,19 @@ struct GameScene final {
         FOREGROUND
     };
 
-    struct Player {
-        int x = {};
-        int y = {};
-    };
-
-    TLN_Sequence idle_sequence = {};
-
     unsigned int world_width  = {};
     unsigned int world_height = {};
     unsigned int camera_x     = {};
 
     Player       player       = {};
+
+    [[nodiscard]] static bool IsValid(const GameScene &scene) noexcept
+    { return Player::IsValid(scene.player); }
 };
 
 [[nodiscard]] GameScene InitScene();     
 [[nodiscard]] bool SetupWorld(GameScene &scene);
-[[nodiscard]] bool SetupSequences(GameScene &scene);
-[[nodiscard]] bool SetupPlayer(GameScene &scene);
+[[nodiscard]] bool SetupPlayer(Player &player);
 
 void RunScene(GameScene &scene);
 void DestroyScene(GameScene &scene);
@@ -40,7 +36,7 @@ void DestroyScene(GameScene &scene);
 Scenes::SceneMessage Scenes::RunGameScene()
 {
     GameScene scene = InitScene();     
-    if (scene.idle_sequence == nullptr)
+    if (GameScene::IsValid(scene) == false)
         return SceneMessage::ERROR;
     RunScene(scene);
     DestroyScene(scene);
@@ -57,11 +53,7 @@ GameScene InitScene()
     if (result == false)
         return {};
     
-    result = SetupSequences(scene);
-    if (result == false)
-        return {};
-    
-    result = SetupPlayer(scene);
+    result = SetupPlayer(scene.player);
     if (result == false)
         return {};
 
@@ -82,48 +74,14 @@ bool SetupWorld(GameScene &scene)
     return true;
 }
 
-bool SetupSequences(GameScene &scene)
+bool SetupPlayer(Player &player)
 {
-    constexpr unsigned int sequence_delay = 6;
+    constexpr unsigned int player_x = 28;
+    constexpr unsigned int player_y = 114;
 
-    scene.idle_sequence = ResourceManager::GetSequence("knight_idle", "idle");
-    if (scene.idle_sequence == nullptr) {
-        Error::LogLastError();
-        DestroyScene(scene);
-        return false; 
-    }
-    return true;
-}
-
-bool SetupPlayer(GameScene &scene)
-{
-    constexpr unsigned int  sprite_index              = 0;
-    constexpr unsigned int  loop                      = 0;
-    constexpr unsigned int  initial_player_position_x = 28;
-    constexpr unsigned int  initial_player_position_y = 114;
-    constexpr std::uint32_t flags                     = 0;
-
-    scene.player.x = initial_player_position_x;
-    scene.player.y = initial_player_position_y; 
-
-	bool result = TLN_ConfigSprite(sprite_index, ResourceManager::GetSpriteset("knight_idle"), flags);
-    if (result == false) {
-        Error::LogLastError();
-        DestroyScene(scene);
-        return false;
-    }
-
-	result = TLN_SetSpriteAnimation(sprite_index, scene.idle_sequence, loop);
-    if (result == false) {
-        Error::LogLastError();
-        DestroyScene(scene);
-        return false;
-    }
-
-	result = TLN_SetSpriteWorldPosition(sprite_index, scene.player.x, scene.player.y);
-    if (result == false) {
-        Error::LogLastError();
-        DestroyScene(scene);
+    player = Player::Init(player_x, player_y);
+    if (Player::IsValid(player) == false) {
+        Error::LogError("Can't initialize player!");
         return false;
     }
     return true;
@@ -136,24 +94,13 @@ void RunScene(GameScene &scene)
 	TLN_SetWorldPosition(scene.camera_x, 0);
     while(TLN_ProcessWindow()) {
         TLN_DrawFrame(0);
-		if (TLN_GetInput(INPUT_LEFT) && scene.camera_x > 0)
-			scene.camera_x -= 3;
-		else if (TLN_GetInput(INPUT_RIGHT) && scene.camera_x < scene.world_width - TLN_GetWidth())
-			scene.camera_x += 3;
-
-		if (scene.camera_x != old_camera_x)
-		{
-			TLN_SetWorldPosition(scene.camera_x, 0);
-			old_camera_x = scene.camera_x;
-		}
+        Player::ProcessInput(scene.player);
     }
 }
 
 void DestroyScene(GameScene &scene)
 {
     TLN_ReleaseWorld();
-    if (scene.idle_sequence != nullptr)
-        Utils::TryDeleteSequence(scene.idle_sequence);
 }
 
 } // namespace

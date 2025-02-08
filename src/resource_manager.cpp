@@ -16,7 +16,6 @@ backgrounds_table   backgrounds     = {};
 foregrounds_table   foregrounds     = {}; 
 spritesets_table    spritesets      = {};
 sequencepacks_table sequences_packs = {};
-
 } // namespace
 
 bool ResourceManager::Init()
@@ -53,7 +52,13 @@ TLN_Tilemap ResourceManager::GetForeground(const std::string &name)
 
 TLN_Spriteset ResourceManager::GetSpriteset(const std::string &name)
 {
-    return spritesets.at(name);
+    try {
+        TLN_Spriteset spriteset = spritesets.at(name);
+        return spriteset;
+    } catch(const std::exception &ex) {
+        Error::LogError(ex.what() + std::string{" | Can't get a spriteset: "} + name);
+        return nullptr;
+    }
 }
 
 TLN_Sequence ResourceManager::GetSequence(const std::string &sequence_pack,
@@ -78,13 +83,15 @@ spritesets_table LoadSpritesets()
 {
     return {
         { "knight_idle", TLN_LoadSpriteset("knight/knight_idle.png") },
+        { "knight_run", TLN_LoadSpriteset("knight/knight_run.png") },
+        { "knight_jump", TLN_LoadSpriteset("knight/knight_jump.png") },
     };
 }
 
 sequencepacks_table LoadSequencePacks()
 {
     return {
-        { "knight_idle", TLN_LoadSequencePack("knight/knight_idle.sqx") },
+        { "knight", TLN_LoadSequencePack("knight/knight.sqx") },
     };
 }
 
