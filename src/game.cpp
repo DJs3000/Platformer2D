@@ -3,6 +3,8 @@
 #include "error.hpp"
 #include "scenes.hpp"
 
+#include <SDL2/SDL.h>
+
 bool Platformer2D::Init()
 {
     constexpr unsigned int width              = 424;
@@ -12,10 +14,10 @@ bool Platformer2D::Init()
     constexpr unsigned int pallete_animations = 0;
 
     TLN_Engine engine = TLN_Init(width, 
-                                  height, 
-                                  background_layers, 
-                                  sprites, 
-                                  pallete_animations);
+                                 height, 
+                                 background_layers, 
+                                 sprites, 
+                                 pallete_animations);
     if (engine == nullptr) {
         Error::LogLastError();
         return false;
@@ -36,6 +38,11 @@ bool Platformer2D::Init()
     }
 
     TLN_DisableCRTEffect();
+
+	TLN_DefineInputKey(PLAYER1, INPUT_UP, SDLK_SPACE);
+	TLN_DefineInputKey(PLAYER1, INPUT_DOWN, SDLK_s);
+	TLN_DefineInputKey(PLAYER1, INPUT_LEFT, SDLK_a);
+	TLN_DefineInputKey(PLAYER1, INPUT_RIGHT, SDLK_d);
     return true;
 }
 
@@ -53,6 +60,8 @@ void Platformer2D::Run()
             break;
         case Scenes::SceneMessage::EXIT:
             running = false;
+            break;
+        default:
             break;
         }
     }
