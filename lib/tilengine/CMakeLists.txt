@@ -12,7 +12,7 @@ set( ZLIB_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set( SDL_STATIC          ON  CACHE BOOL "" FORCE )
 set( SKIP_INSTALL_ALL ON CACHE BOOL "" FORCE)
 add_subdirectory(zlib-1.3.1)
-add_subdirectory(libpng-1.6.44)
+add_subdirectory(libpng-1.6.45)
 add_subdirectory(SDL-2.30.9)
 
 file(GLOB SOURCES
