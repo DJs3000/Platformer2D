@@ -1,12 +1,6 @@
-#include <raylib.h>
+#include "game.hpp"
 
 int main()
 {
-    InitWindow(800, 600, "Platformer");
-    while(!WindowShouldClose()) {
-        BeginDrawing();
-            ClearBackground(BLACK);
-        EndDrawing();
-    }
-    CloseWindow();
+    return Platformer::Run();
 }
