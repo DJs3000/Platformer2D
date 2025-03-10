@@ -57,6 +57,11 @@ jobs:
         sudo apt-get -y install libxinerama-dev
         sudo apt-get -y install libxcursor-dev
         sudo apt-get -y install libxi-dev
+        sudo apt-get install -y \
+            libgl1-mesa-dev \
+            libglu1-mesa-dev \
+            mesa-utils \
+            xvfb
         
     - name: Set reusable strings
       # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
