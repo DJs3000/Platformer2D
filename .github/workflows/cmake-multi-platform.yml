@@ -51,7 +51,8 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run: |
         sudo apt-get update
-        sudo apt-get install -y xorg-server-xvfb
+        sudo apt-get -y install xorg 
+        sudo apt-get -y install xvfb
         
     - name: Set reusable strings
       # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
