@@ -6,4 +6,5 @@ target_sources( main PRIVATE
     "resource_manager.cpp"
     "player.cpp"
     "aseprite.c"
+    "raytmx.c"
     )
