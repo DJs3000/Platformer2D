@@ -53,7 +53,7 @@ void GameScene::Draw(const GameScene &scene)
     Graphics::BeginRender();
         BeginMode2D(scene.camera);
             ClearBackground(BLACK);
-            DrawTMX(scene.map.map, {}, 0, 0, WHITE);
+            DrawTMX(scene.map.map, &scene.camera, 0, 0, WHITE);
             Player::Draw(*scene.player);
         EndMode2D();
     Graphics::EndRender();
