@@ -13,3 +13,4 @@ CMakeUserPresets.json
 ctags
 cscope.out
 tags
+build
