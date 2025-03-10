@@ -19,8 +19,9 @@ struct Player {
     Vector2                 pos         = {};
     Direction               dir         = Direction::RIGHT; 
     State                   state       = State::IDLE;
+    Camera2D                *camera     = nullptr;
 
-    static Player Init(ResourceManager::Sprite &sprite, const Vector2 &position);
+    static Player Init(ResourceManager::Sprite &sprite, const Vector2 &position, Camera2D &camera);
     static void ProcessEvents(Player &player);
     static void Update(Player &player);
     static void Draw(const Player &player);

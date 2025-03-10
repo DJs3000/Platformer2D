@@ -1,11 +1,12 @@
 #include "player.hpp"
 
-Player Player::Init(ResourceManager::Sprite &sprite, const Vector2 &position)
+Player Player::Init(ResourceManager::Sprite &sprite, const Vector2 &position, Camera2D &camera)
 {
     return {
         .current_tag = sprite.tags["Idle"],
         .sprite      = sprite,
         .pos         = position,
+        .camera      = &camera,
     };
 }
 
@@ -17,7 +18,8 @@ void Player::ProcessEvents(Player &player)
             player.state = State::RUNNING;
         }
         player.dir = Direction::LEFT;
-        --player.pos.x;
+        player.pos.x -= 45 * GetFrameTime();
+        player.camera->target.x -= 45 * GetFrameTime();
     } else if (IsKeyReleased(KEY_A) == true) {
         player.state       = State::IDLE;
         player.current_tag = player.sprite.tags["Idle"]; 
@@ -29,7 +31,8 @@ void Player::ProcessEvents(Player &player)
             player.state = State::RUNNING;
         }
         player.dir = Direction::RIGHT;
-        ++player.pos.x;
+        player.pos.x += 45 * GetFrameTime();
+        player.camera->target.x += 45 * GetFrameTime();
     } else if (IsKeyReleased(KEY_D) == true) {
         player.state = State::IDLE;
         player.current_tag = player.sprite.tags["Idle"];

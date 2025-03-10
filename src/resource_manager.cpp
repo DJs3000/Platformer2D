@@ -1,11 +1,18 @@
 #include <raylib-aseprite.h>
 #include <unordered_map>
 #include "resource_manager.hpp"
+#include "raytmx.h"
 
 namespace {
     std::unordered_map<std::string, ResourceManager::Sprite> sprites_table = {};
+    std::unordered_map<std::string, TmxMap*>                 map_table     = {};
 
     [[nodiscard]] bool LoadSprite(ResourceManager::Sprite::Info &&info, std::string &&resource_name);
+    [[nodiscard]] bool LoadMap(const std::string &&path, std::string &&name);
+    [[nodiscard]] Vector2 GetPlayerSpawnPosition(const TmxMap *map);
+    [[nodiscard]] TmxObjectGroup GetObjectGroupFromLayer(const TmxMap *map, const std::string &layer_name);
+    [[nodiscard]] TmxObject GetObjectFromGroup(const TmxObjectGroup &object_group, const std::string &name);
+    [[nodiscard]] TmxProperty GetPropertyFromObject(const TmxObject &object, const std::string &name);
 }
 
 bool ResourceManager::LoadResources()
@@ -22,6 +29,10 @@ bool ResourceManager::LoadResources()
         },
     };
     bool loaded = LoadSprite(std::move(player_sprite), "player");
+    if (loaded == false)
+        return false;
+
+    loaded = LoadMap("assets/levels/cave_level.tmx", "cave");
     return loaded;
 }
 
@@ -29,6 +40,8 @@ void ResourceManager::UnloadResources()
 {
     for (auto &[key, sprite] : sprites_table)
         UnloadAseprite(sprite.aseprite);
+    for (auto &[key, map] : map_table)
+        UnloadTMX(map);
 }
 
 ResourceManager::Sprite ResourceManager::GetSprite(const std::string &resource_name)
@@ -39,6 +52,20 @@ ResourceManager::Sprite ResourceManager::GetSprite(const std::string &resource_n
     } catch(std::exception &ex) {
         TraceLog(LOG_ERROR, ex.what());
         return {};
+    }
+}
+
+ResourceManager::Map ResourceManager::GetMap(const std::string &map_name)
+{
+    try {
+        Map     map            = {};
+        TmxMap *tmx_map        = map_table.at(map_name);
+        map.map                = tmx_map;
+        map.player_spawn_point = GetPlayerSpawnPosition(tmx_map);
+        return map;
+    } catch(std::exception &ex) {
+        TraceLog(LOG_ERROR, ex.what());
+        return {}; 
     }
 }
 
@@ -72,5 +99,43 @@ namespace {
         }
         sprites_table.insert({std::move(resource_name), std::move(sprite)});
         return true;
+    }
+
+    bool LoadMap(const std::string &&path, std::string &&name)
+    {
+        TmxMap *map = LoadTMX(path.c_str());
+        if (map == nullptr) {
+            TraceLog(LOG_ERROR, "Failed to load TMX");
+            return false;
+        }
+        map_table.insert({std::move(name), map});
+        return true;
+    }
+
+    Vector2 GetPlayerSpawnPosition(const TmxMap *map)
+    {
+        TmxObjectGroup group  = GetObjectGroupFromLayer(map, "player");
+        TmxObject      player = GetObjectFromGroup(group, "player");
+        return {static_cast<float>(player.x), static_cast<float>(player.y)};
+    }
+
+    TmxObjectGroup GetObjectGroupFromLayer(const TmxMap *map, const std::string &layer_name)
+    {
+        for (unsigned int i = 0; i < map->layersLength; ++i) {
+            TmxLayer layer = map->layers[i];
+            if (layer_name == layer.name && layer.type == LAYER_TYPE_OBJECT_GROUP)
+                return layer.exact.objectGroup;
+        }
+        return {};
+    }
+
+    TmxObject GetObjectFromGroup(const TmxObjectGroup &object_group, const std::string &name)
+    {
+        for (unsigned int i = 0; i < object_group.objectsLength; ++i) {
+            TmxObject object = object_group.objects[i];
+            if (name == object.name)
+                return object;
+        }
+        return {};
     }
 }
