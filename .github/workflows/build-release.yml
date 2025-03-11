@@ -49,7 +49,18 @@ jobs:
     steps:
       # Check out the repository
       - uses: actions/checkout@v4
-
+      
+      - name: Verify Compiler Installation
+        shell: bash
+        run: |
+          if [ "${{ matrix.c_compiler }}" == "gcc" ]; then
+            gcc --version || echo "GCC not found"
+          elif [ "${{ matrix.c_compiler }}" == "clang" ]; then
+            clang --version || echo "Clang not found"
+          elif [ "${{ matrix.c_compiler }}" == "cl" ]; then
+            cl || echo "MSVC (cl) not found"
+          fi
+      
       # Install dependencies (Linux)
       - name: Install dependencies (Linux)
         if: matrix.os == 'ubuntu-latest'
