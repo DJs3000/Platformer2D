@@ -1,0 +1,133 @@
+name: CMake Release Builds
+
+on:
+  release:
+    types: [published]  # Triggers when a new release is published
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      # Set fail-fast to false to ensure that feedback is delivered for all matrix combinations.
+      fail-fast: false
+
+      # Set up a matrix to run the following configurations:
+      # 1. <Windows, Release, MSVC compiler toolchain>
+      # 2. <Linux, Release, GCC compiler toolchain>
+      # 3. <Linux, Release, Clang compiler toolchain>
+      # 4. <macOS, Release, Clang compiler toolchain>
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        build_type: [Release]
+        c_compiler: [gcc, clang, cl]
+        include:
+          - os: windows-latest
+            c_compiler: cl
+            cpp_compiler: cl
+          - os: ubuntu-latest
+            c_compiler: gcc
+            cpp_compiler: g++
+          - os: ubuntu-latest
+            c_compiler: clang
+            cpp_compiler: clang++
+          - os: macos-latest
+            c_compiler: clang
+            cpp_compiler: clang++
+        exclude:
+          - os: windows-latest
+            c_compiler: gcc
+          - os: windows-latest
+            c_compiler: clang
+          - os: ubuntu-latest
+            c_compiler: cl
+          - os: macos-latest
+            c_compiler: cl
+          - os: macos-latest
+            c_compiler: gcc
+
+    steps:
+      # Check out the repository
+      - uses: actions/checkout@v4
+      
+      - name: Verify Compiler Installation
+        shell: bash
+        run: |
+          if [ "${{ matrix.c_compiler }}" == "gcc" ]; then
+            gcc --version || echo "GCC not found"
+          elif [ "${{ matrix.c_compiler }}" == "clang" ]; then
+            clang --version || echo "Clang not found"
+          elif [ "${{ matrix.c_compiler }}" == "cl" ]; then
+            cl || echo "MSVC (cl) not found"
+          fi
+      
+      # Install dependencies (Linux)
+      - name: Install dependencies (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install xorg 
+          sudo apt-get -y install libx11-dev
+          sudo apt-get -y install libxrandr-dev
+          sudo apt-get -y install libxinerama-dev
+          sudo apt-get -y install libxcursor-dev
+          sudo apt-get -y install libxi-dev
+          sudo apt-get install -y \
+              libgl1-mesa-dev \
+              libglu1-mesa-dev \
+              mesa-utils \
+              xvfb
+
+      # Set reusable strings (e.g., build output directory)
+      - name: Set reusable strings
+        id: strings
+        shell: bash
+        run: |
+          echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+
+      # Configure CMake
+      - name: Configure CMake
+        run: >
+          cmake -B ${{ steps.strings.outputs.build-output-dir }}
+          -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
+          -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
+          -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+          -S ${{ github.workspace }}
+
+      # Build the project
+      - name: Build
+        run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
+
+      # Determine the executable name based on the OS
+      - name: Determine executable name
+        id: executable
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            echo "EXECUTABLE_NAME=platformer_linux" >> "$GITHUB_OUTPUT"
+          elif [ "$RUNNER_OS" == "Windows" ]; then
+            echo "EXECUTABLE_NAME=platformer_windows.exe" >> "$GITHUB_OUTPUT"
+          elif [ "$RUNNER_OS" == "macOS" ]; then
+            echo "EXECUTABLE_NAME=platformer_macos" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Rename the executable to include the OS name
+      - name: Rename executable
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            mv ${{ steps.strings.outputs.build-output-dir }}/platformer ${{ steps.strings.outputs.build-output-dir }}/${{ steps.executable.outputs.EXECUTABLE_NAME }}
+          elif [ "$RUNNER_OS" == "Windows" ]; then
+            mv ${{ steps.strings.outputs.build-output-dir }}/Release/platformer.exe ${{ steps.strings.outputs.build-output-dir }}/${{ steps.executable.outputs.EXECUTABLE_NAME }}
+          elif [ "$RUNNER_OS" == "macOS" ]; then
+            mv ${{ steps.strings.outputs.build-output-dir }}/platformer ${{ steps.strings.outputs.build-output-dir }}/${{ steps.executable.outputs.EXECUTABLE_NAME }}
+          fi
+
+      # Upload the executable to the release
+      - name: Upload release asset
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ github.event.release.upload_url }}  # Automatically provided by GitHub
+          asset_path: ${{ steps.strings.outputs.build-output-dir }}/${{ steps.executable.outputs.EXECUTABLE_NAME }}  # Path to the executable
+          asset_name: ${{ steps.executable.outputs.EXECUTABLE_NAME }}  # Name of the executable in the release
+          asset_content_type: application/octet-stream  # MIME type for binaries
