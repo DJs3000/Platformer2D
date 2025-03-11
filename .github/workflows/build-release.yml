@@ -3,7 +3,9 @@ name: CMake Release Builds
 on:
   release:
     types: [published]  # Triggers when a new release is published
-
+permissions:
+  contents: write  # Required to upload release assets
+  
 jobs:
   build:
     runs-on: ${{ matrix.os }}
