@@ -1,0 +1,62 @@
+name: Build and Release C++ Executables
+
+on:
+  release:
+    types: [published]  # Triggers when a new release is published
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}  # Use a matrix to build for multiple OSes
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]  # Linux, Windows, macOS
+    steps:
+      # Check out the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install dependencies (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install xorg 
+          sudo apt-get -y install libx11-dev
+          sudo apt-get -y install libxrandr-dev
+          sudo apt-get -y install libxinerama-dev
+          sudo apt-get -y install libxcursor-dev
+          sudo apt-get -y install libxi-dev
+          sudo apt-get install -y \
+            libgl1-mesa-dev \
+            libglu1-mesa-dev \
+            mesa-utils \
+            xvfb
+
+      - name: Set reusable strings
+        # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
+        id: strings
+        shell: bash
+        run: |
+          echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+          
+      - name: Configure CMake
+        # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
+        # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
+        run: >
+          cmake -B ${{ steps.strings.outputs.build-output-dir }}
+          -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
+          -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
+          -DCMAKE_BUILD_TYPE=RELEASE
+          -S ${{ github.workspace }}
+
+      - name: Build
+        # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
+        run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
+
+      # Upload the executable to the release
+      - name: Upload release asset
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ github.event.release.upload_url }}  # Automatically provided by GitHub
+          asset_path: ${{ steps.strings.outputs.build-output-dir }}/${{ steps.executable.outputs.EXECUTABLE_NAME }}  # Path to the executable
+          asset_name: ${{ steps.executable.outputs.EXECUTABLE_NAME }}  # Name of the executable in the release
+          asset_content_type: application/octet-stream  # MIME type for binaries
