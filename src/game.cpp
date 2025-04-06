@@ -2,6 +2,8 @@
 #include "graphics.hpp"
 #include "scenes.hpp"
 #include "resource_manager.hpp"
+#include "physics.hpp"
+#include "physac.h"
 #include <cstdlib>
 
 namespace {
@@ -31,6 +33,10 @@ namespace {
         is_initialized = ResourceManager::LoadResources();
         if (is_initialized == false)
             return false;
+        
+        is_initialized = Physics::Init();
+        if (is_initialized == false)
+            return false;
 
         SetExitKey(KEY_NULL);
         SetTargetFPS(120);
@@ -39,6 +45,12 @@ namespace {
 
     void Close()
     {
+        Physics::Close();
+        int bodiesCount = GetPhysicsBodiesCount();
+        for (int i = 0; i < bodiesCount; i++) {
+            PhysicsBody body = GetPhysicsBody(i);
+            DestroyPhysicsBody(body);
+        }
         ResourceManager::UnloadResources();
         Graphics::Close();
     }

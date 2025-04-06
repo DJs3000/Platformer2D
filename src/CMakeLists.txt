@@ -5,6 +5,7 @@ target_sources( main PRIVATE
     "game_scene.cpp"
     "resource_manager.cpp"
     "player.cpp"
+    "physics.cpp"
     "aseprite.c"
     "raytmx.c"
     )
