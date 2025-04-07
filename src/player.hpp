@@ -1,6 +1,8 @@
 #pragma once
 #include <raylib-aseprite.h>
 #include <cstdint>
+
+#include "camera.hpp"
 #include "resource_manager.hpp"
 
 struct Player {
@@ -19,10 +21,15 @@ struct Player {
     Vector2                 pos         = {};
     Direction               dir         = Direction::RIGHT; 
     State                   state       = State::IDLE;
-    Camera2D                *camera     = nullptr;
+    TargetCamera           *camera      = {};
+    AsepriteSlice           slice       = {};
+    AsepriteSlice           pad_slice   = {};
+    Rectangle               hitbox      = {};
+    Rectangle               pad         = {};
 
-    static Player Init(ResourceManager::Sprite &sprite, const Vector2 &position, Camera2D &camera);
+    static Player Init(ResourceManager::Sprite &sprite, const Vector2 &position, TargetCamera &camera);
     static void ProcessEvents(Player &player);
     static void Update(Player &player);
+    static void UpdateHitbox(Player &player);
     static void Draw(const Player &player);
 };

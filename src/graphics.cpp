@@ -11,7 +11,7 @@ bool Graphics::Init() noexcept
 {
     constexpr Rectangle window_size = {0.f, 0.f, 1280.f, 800.f};
     constexpr const char *window_title = "Platformer";
-    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_MSAA_4X_HINT);
     InitWindow(window_size.width, window_size.height, window_title);
     if (IsWindowReady() == false)
         return false;
@@ -20,7 +20,7 @@ bool Graphics::Init() noexcept
     if (IsRenderTextureValid(target_texture) == false)
         return false;
 
-    SetTextureFilter(target_texture.texture, TEXTURE_FILTER_POINT);
+    SetTextureFilter(target_texture.texture, TEXTURE_FILTER_ANISOTROPIC_16X);
     return true;
 }
 
@@ -38,6 +38,7 @@ void Graphics::BeginRender() noexcept
 
     cursor_position.x = mouse_x * render_area.width / width;
     cursor_position.y = mouse_y * render_area.height / height;
+
     BeginTextureMode(target_texture);
 }
 

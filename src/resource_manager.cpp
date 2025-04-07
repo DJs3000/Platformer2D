@@ -26,6 +26,7 @@ bool ResourceManager::LoadResources()
         },
         .slices = {
             "hitbox_1",
+            "pad",
         },
     };
     bool loaded = LoadSprite(std::move(player_sprite), "player");
