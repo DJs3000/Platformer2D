@@ -25,6 +25,7 @@ bool ResourceManager::LoadResources()
             "hitbox_1",
         },
     };
+
     bool loaded = LoadSprite(std::move(player_sprite), "player");
     if (loaded == false)
         return false;

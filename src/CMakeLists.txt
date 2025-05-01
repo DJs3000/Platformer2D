@@ -7,4 +7,5 @@ target_sources( main PRIVATE
     "player.cpp"
     "aseprite.c"
     "raytmx.c"
+    "physics.cpp"
     )

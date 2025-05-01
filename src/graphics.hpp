@@ -5,7 +5,7 @@ struct Aseprite;
 struct AsepriteTag;
 
 namespace Graphics {
-    inline constexpr Rectangle render_area       = {0.f, 0.f, 640.f, 480.f};
+    inline constexpr Rectangle render_area       = {0.f, 0.f, 1280.f, 720.f};
     inline constexpr int       default_font_size = 14;
 
     [[nodiscard]] bool Init() noexcept;

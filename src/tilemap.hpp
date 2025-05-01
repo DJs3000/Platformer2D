@@ -1,5 +1,6 @@
 #pragma once
 #include <cassert>
+#include <string>
 
 #include "raytmx.h"
 
@@ -36,11 +37,28 @@ namespace Tilemap {
         return {};
     }
 
+    inline void UpdateGroupPosition(const TmxObjectGroup &object_group)
+    {
+        for (unsigned int i = 0; i < object_group.objectsLength; ++i) {
+            ++object_group.objects[i].y;
+        }
+    }
+
     [[nodiscard]] inline Vector2 GetPlayerSpawnPosition(const TmxMap *map)
     {
         assert(map != nullptr);
         TmxObjectGroup group  = GetObjectGroupFromLayer(map, "player");
         TmxObject      player = GetObjectFromGroup(group, "player");
         return {static_cast<float>(player.x), static_cast<float>(player.y)};
+    }
+
+    [[nodiscard]] inline bool GetPropertyFromObject(const TmxObject &object, const std::string &name)
+    {
+        for (unsigned int i = 0; i < object.propertiesLength; i++) {
+            const TmxProperty property = object.properties[i];
+            if (property.name == name && property.type == PROPERTY_TYPE_BOOL)
+                return property.boolValue;
+        }
+        return {};
     }
 }

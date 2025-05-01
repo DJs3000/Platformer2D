@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 #pragma once
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-equal"
 
 #include "base.h"
 
@@ -640,6 +642,7 @@ inline bool operator!=( b2Vec2 a, b2Vec2 b )
 	return a.x != b.x || a.y != b.y;
 }
 
+#pragma GCC diagnostic pop
 #endif
 
 /**@}*/
