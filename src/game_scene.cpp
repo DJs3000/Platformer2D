@@ -2,11 +2,11 @@
 #include "graphics.hpp"
 #include "resource_manager.hpp"
 #include "player.hpp"
+#include "tilemap.hpp"
 
 #include <raylib.h>
 #include <raylib-aseprite.h>
 #include <memory>
-#include "raytmx.h"
 
 namespace {
     struct GameScene {
