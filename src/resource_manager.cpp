@@ -2,6 +2,7 @@
 #include <unordered_map>
 #include "resource_manager.hpp"
 #include "raytmx.h"
+#include "tilemap.hpp"
 
 namespace {
     std::unordered_map<std::string, ResourceManager::Sprite> sprites_table = {};
@@ -9,10 +10,6 @@ namespace {
 
     [[nodiscard]] bool LoadSprite(ResourceManager::Sprite::Info &&info, std::string &&resource_name);
     [[nodiscard]] bool LoadMap(const std::string &&path, std::string &&name);
-    [[nodiscard]] Vector2 GetPlayerSpawnPosition(const TmxMap *map);
-    [[nodiscard]] TmxObjectGroup GetObjectGroupFromLayer(const TmxMap *map, const std::string &layer_name);
-    [[nodiscard]] TmxObject GetObjectFromGroup(const TmxObjectGroup &object_group, const std::string &name);
-    [[nodiscard]] TmxProperty GetPropertyFromObject(const TmxObject &object, const std::string &name);
 }
 
 bool ResourceManager::LoadResources()
@@ -61,7 +58,7 @@ ResourceManager::Map ResourceManager::GetMap(const std::string &map_name)
         Map     map            = {};
         TmxMap *tmx_map        = map_table.at(map_name);
         map.map                = tmx_map;
-        map.player_spawn_point = GetPlayerSpawnPosition(tmx_map);
+        map.player_spawn_point = Tilemap::GetPlayerSpawnPosition(tmx_map);
         return map;
     } catch(std::exception &ex) {
         TraceLog(LOG_ERROR, ex.what());
@@ -110,32 +107,5 @@ namespace {
         }
         map_table.insert({std::move(name), map});
         return true;
-    }
-
-    Vector2 GetPlayerSpawnPosition(const TmxMap *map)
-    {
-        TmxObjectGroup group  = GetObjectGroupFromLayer(map, "player");
-        TmxObject      player = GetObjectFromGroup(group, "player");
-        return {static_cast<float>(player.x), static_cast<float>(player.y)};
-    }
-
-    TmxObjectGroup GetObjectGroupFromLayer(const TmxMap *map, const std::string &layer_name)
-    {
-        for (unsigned int i = 0; i < map->layersLength; ++i) {
-            TmxLayer layer = map->layers[i];
-            if (layer_name == layer.name && layer.type == LAYER_TYPE_OBJECT_GROUP)
-                return layer.exact.objectGroup;
-        }
-        return {};
-    }
-
-    TmxObject GetObjectFromGroup(const TmxObjectGroup &object_group, const std::string &name)
-    {
-        for (unsigned int i = 0; i < object_group.objectsLength; ++i) {
-            TmxObject object = object_group.objects[i];
-            if (name == object.name)
-                return object;
-        }
-        return {};
     }
 }
