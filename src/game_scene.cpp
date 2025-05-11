@@ -4,7 +4,7 @@
 #include "player.hpp"
 #include "tilemap.hpp"
 #include "physics_constants.hpp"
-#include "physics.hpp"
+#include "system.hpp"
 
 #include <raylib.h>
 #include <raylib-aseprite.h>
@@ -33,9 +33,9 @@ Scenes::Message Scenes::RunGameScene()
 {
     GameScene scene = GameScene::Init();
     ResourceManager::Sprite sprite = ResourceManager::GetSprite("player");
-    scene.player = std::make_unique<Player>();
+    scene.player  = std::make_unique<Player>();
     *scene.player = Player::Init(sprite, scene.map.player_spawn_point, scene.camera);
-    scene.bodies = Physics::InitObjects(Tilemap::GetObjectGroupFromLayer(scene.map.map, "boxes"), scene.world);
+    scene.bodies  = Physics::InitObjects(Tilemap::GetObjectGroupFromLayer(scene.map.map, "boxes"), scene.world);
     while(!WindowShouldClose()) {
         GameScene::ProcessEvents(scene);
         GameScene::Update(scene);
@@ -66,13 +66,14 @@ void GameScene::Draw(const GameScene &scene)
             ClearBackground(BLACK);
             DrawTMX(scene.map.map, &scene.camera, 0, 0, WHITE);
             Player::Draw(*scene.player);
+            Graphics::DrawDebugPhysicsEdges(scene.bodies);
         EndMode2D();
     Graphics::EndRender();
 }
 
 GameScene GameScene::Init()
 {
-    ResourceManager::Map    map    = ResourceManager::GetMap("cave");
+    ResourceManager::Map map = ResourceManager::GetMap("cave");
     
     Camera2D camera = {};
     camera.zoom     = 2.f;

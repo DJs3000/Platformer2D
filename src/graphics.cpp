@@ -68,3 +68,25 @@ void Graphics::Close() noexcept
         CloseWindow();
     }
 }
+
+void Graphics::DrawDebugPhysicsEdges(const std::vector<Physics::Body> &bodies)
+{
+    for (const auto &body : bodies) {
+        // The boxes were created centered on the bodies, but raylib draws textures starting at the top left corner.
+        // b2Body_GetWorldPoint gets the top left corner of the box accounting for rotation.
+        b2Vec2 p = b2Body_GetWorldPoint(body.id, {-body.extent.x, -body.extent.y});
+        b2Rot  rotation = b2Body_GetRotation(body.id);
+        float  radians = b2Rot_GetAngle(rotation);
+
+        Vector2 ps = {p.x, p.y};
+
+        // I used these circles to ensure the coordinates are correct
+        DrawCircleV(ps, 5.0f, GREEN);
+        p = b2Body_GetWorldPoint(body.id, {0.0f, 0.0f});
+        ps = {p.x, p.y};
+        DrawCircleV(ps, 5.0f, BLUE);
+        p = b2Body_GetWorldPoint(body.id, {body.extent.x, body.extent.y});
+        ps = {p.x, p.y};
+        DrawCircleV(ps, 5.0f, RED);
+    }
+}

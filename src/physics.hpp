@@ -9,7 +9,7 @@ namespace Physics {
 	    b2BodyId id     = {};
         b2Vec2   extent = {};
     };
-
+    
     [[nodiscard]] std::vector<Body> InitObjects(const TmxObjectGroup &object_group, const b2WorldId world);
     void Update(const std::vector<Body> &bodies, TmxObjectGroup &object_group);
 }

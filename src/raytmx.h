@@ -839,7 +839,7 @@ bool IterateTileLayer(const TmxMap* map, const TmxTileLayer* layer, Rectangle sc
 void DrawTMXTileLayer(const TmxMap* map, Rectangle screenRect, TmxLayer layer, int posX, int posY, Color tint);
 void DrawTMXLayerTile(const TmxMap* map, Rectangle screenRect, uint32_t rawGid, int posX, int posY, Color tint);
 void DrawTMXObjectTile(const TmxMap* map, Rectangle screenRect, uint32_t rawGid, int posX, int posY, float width,
-    float height, Color tint);
+    float height, float rotation, Color tint);
 void DrawTMXObjectGroup(const TmxMap* map, Rectangle screenRect, TmxLayer layer, int posX, int posY, Color tint);
 void DrawTMXImageLayer(const TmxMap* map, Rectangle screenRect, TmxLayer layer, int posX, int posY, Color tint);
 bool CheckCollisionTMXTileLayerObject(const TmxMap* map, const TmxLayer* layers, uint32_t layersLength,
@@ -3349,7 +3349,8 @@ void DrawTMXTileLayer(const TmxMap* map, Rectangle screenRect, TmxLayer layer, i
 }
 
 void DrawTextureTile(Texture2D texture, Rectangle source, Rectangle dest, bool flipX, bool flipY, bool flipDiag,
-        Color tint) {
+                     Color tint) 
+{
     if (texture.id == 0) /* If the texture is invalid */
         return;
 
@@ -3386,7 +3387,7 @@ void DrawTextureTile(Texture2D texture, Rectangle source, Rectangle dest, bool f
     destBottomLeft.y = dest.y + dest.height;
     destBottomRight.x = dest.x + dest.width;
     destBottomRight.y = dest.y + dest.height;
-
+    
     rlSetTexture(texture.id);
     rlBegin(RL_QUADS);
     {
@@ -3494,7 +3495,7 @@ void DrawTMXLayerTile(const TmxMap* map, Rectangle screenRect, uint32_t rawGid, 
 }
 
 void DrawTMXObjectTile(const TmxMap* map, Rectangle screenRect, uint32_t rawGid, int posX, int posY, float width,
-        float height, Color tint) {
+        float height, float rotation, Color tint) {
     if (map == NULL || width <= 0 || height <= 0 || tint.a == 0)
         return;
 
@@ -3520,16 +3521,13 @@ void DrawTMXObjectTile(const TmxMap* map, Rectangle screenRect, uint32_t rawGid,
         /* considers [x, y] to the be top-left corner of any area but the TMX format considers it the bottom-left. */
         Rectangle destRect;
         destRect.x = posX + tile.offset.x;
-        destRect.y = posY + tile.offset.y - height;
+        destRect.y = posY + tile.offset.y;
         destRect.width = width;
         destRect.height = height;
 
         /* If the screen and destination rectangles are overlapping to any degree (i.e. if the tile is visible) */
-        if (CheckCollisionRecs(screenRect, destRect)) {
-            DrawTextureTile(/* texture: */ tile.texture, /* source: */ tile.sourceRect, /* dest: */ destRect,
-                /* flipX: */ isFlippedHorizontally, /* flipY: */ isFlippedVertically,
-                /* flipDiag: */ isFlippedDiagonally, /* tint: */ tint);
-        }
+        if (CheckCollisionRecs(screenRect, destRect))
+            DrawTexturePro(tile.texture, tile.sourceRect, destRect, (Vector2){0.f, 0.f}, rotation, tint);
     }
 }
 
@@ -3550,7 +3548,7 @@ void DrawTMXObjectGroup(const TmxMap* map, Rectangle screenRect, TmxLayer layer,
             /* Note: This draw method handles occlusion culling so it doesn't need to be done here */
             DrawTMXObjectTile(map, /* screenRect: */ screenRect, /* rawGid: */ object.gid,
                 /* posX: */ posX + (int)object.x, /* posY: */ posY + (int)object.y, /* width: */ (float)object.width,
-                /* height: */ (float)object.height, /* color: */ tint);
+                /* height: */ (float)object.height, /* rotation: */ object.rotation, /* color: */ tint);
         } else { /* If the object is any type other than a tile */
             Rectangle offsetAabb = object.aabb;
             offsetAabb.x += posX;

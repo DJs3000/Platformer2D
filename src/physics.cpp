@@ -17,8 +17,8 @@ std::vector<Physics::Body> Physics::InitObjects(const TmxObjectGroup &object_gro
 
             b2BodyDef body_def = b2DefaultBodyDef();
             body_def.position  = {
-                .x = static_cast<float>(object_group.objects[i].x),
-                .y = static_cast<float>(object_group.objects[i].y),
+                .x = static_cast<float>(object_group.objects[i].x + box_extent.x),
+                .y = static_cast<float>(object_group.objects[i].y - box_extent.y),
             };
 
             const bool is_static = Tilemap::GetPropertyFromObject(object_group.objects[i], "static");
@@ -26,7 +26,7 @@ std::vector<Physics::Body> Physics::InitObjects(const TmxObjectGroup &object_gro
                 body_def.type = b2_dynamicBody;
 
             const b2BodyId body_id = b2CreateBody(world, &body_def); 
-            b2ShapeDef shape_def  = b2DefaultShapeDef();
+            b2ShapeDef shape_def   = b2DefaultShapeDef();
 
             b2CreatePolygonShape(body_id, &shape_def, &box_polygon);
             bodies.emplace_back(Body{body_id, box_extent});  
@@ -38,8 +38,12 @@ std::vector<Physics::Body> Physics::InitObjects(const TmxObjectGroup &object_gro
 void Physics::Update(const std::vector<Body> &bodies, TmxObjectGroup &object_group)
 {
     for (unsigned int i = 0; i < object_group.objectsLength; ++i) {
-	    const b2Vec2 position      = b2Body_GetWorldPoint(bodies[i].id, {-bodies[i].extent.x, -bodies[i].extent.y});
-        object_group.objects[i].x  = position.x;
-        object_group.objects[i].y  = position.y;
+	    const b2Vec2 position = b2Body_GetWorldPoint(bodies[i].id, {-bodies[i].extent.x, -bodies[i].extent.y});
+        b2Rot rotation        = b2Body_GetRotation(bodies[i].id);
+        float radians         = b2Rot_GetAngle(rotation);
+
+        object_group.objects[i].x           = position.x;
+        object_group.objects[i].y           = position.y;
+        object_group.objects[i].rotation    = RAD2DEG * radians;
     }
 }

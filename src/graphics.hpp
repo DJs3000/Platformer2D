@@ -1,5 +1,6 @@
 #pragma once
 #include <raylib.h>
+#include "physics.hpp"
 
 struct Aseprite;
 struct AsepriteTag;
@@ -14,4 +15,6 @@ namespace Graphics {
     [[nodiscard]] Vector2 GetCursorPosition() noexcept;
     void BeginRender() noexcept;
     void EndRender() noexcept;
+
+    void DrawDebugPhysicsEdges(const std::vector<Physics::Body> &bodies);
 }
