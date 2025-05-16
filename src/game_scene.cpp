@@ -5,6 +5,7 @@
 #include "tilemap.hpp"
 #include "physics_constants.hpp"
 #include "system.hpp"
+#include "camera.hpp"
 
 #include <raylib.h>
 #include <raylib-aseprite.h>
@@ -13,12 +14,12 @@
 
 namespace {
     struct GameScene {
-        ResourceManager::Map       map           = {};
-        Camera2D                   camera        = {};
-        std::unique_ptr<Player>    player        = {};
-        b2WorldId                  world         = {};
-        Physics::ObjectsTable      physics_table = {};
-        bool                       debug_draw    = {};
+        ResourceManager::Map  map           = {};
+        Camera2D              camera        = {};
+        Player                player        = {};
+        b2WorldId             world         = {};
+        Physics::ObjectsTable physics_table = {};
+        bool                  debug_draw    = {};
 
         [[nodiscard]] static GameScene Init();
          
@@ -31,11 +32,6 @@ namespace {
 Scenes::Message Scenes::RunGameScene()
 {
     GameScene scene = GameScene::Init();
-    ResourceManager::Sprite sprite = ResourceManager::GetSprite("player");
-    scene.player        = std::make_unique<Player>();
-    *scene.player       = Player::Init(sprite, scene.map.player_spawn_point, scene.camera);
-    scene.physics_table = Physics::CreatePhysicsBodies(*scene.map.map, scene.world);
-
     while(!WindowShouldClose()) {
         GameScene::ProcessEvents(scene);
         GameScene::Update(scene);
@@ -51,15 +47,16 @@ void GameScene::ProcessEvents(GameScene &scene)
         if (IsKeyPressed(KEY_TWO) == true)
             scene.debug_draw = !scene.debug_draw;
     }
-    Player::ProcessEvents(*scene.player);    
+    Player::ProcessEvents(scene.player);    
 }
 
 void GameScene::Update(GameScene &scene)
 {
     constexpr int steps = 4; 
     b2World_Step(scene.world, GetFrameTime(), steps);
-    Player::Update(*scene.player);
+    Player::Update(scene.player);
     Physics::Update(*scene.map.map, scene.physics_table);
+    UpdateCamera2D(scene.camera, scene.player.pos, scene.map.map->tileWidth * scene.map.map->width);
 }
 
 void GameScene::Draw(const GameScene &scene)
@@ -68,7 +65,7 @@ void GameScene::Draw(const GameScene &scene)
         BeginMode2D(scene.camera);
             ClearBackground(BLACK);
             DrawTMX(scene.map.map, &scene.camera, 0, 0, WHITE);
-            Player::Draw(*scene.player);
+            Player::Draw(scene.player);
             if (scene.debug_draw)
                 Graphics::DrawDebugPhysics(scene.physics_table);
         EndMode2D();
@@ -77,8 +74,9 @@ void GameScene::Draw(const GameScene &scene)
 
 GameScene GameScene::Init()
 {
-    ResourceManager::Map map = ResourceManager::GetMap("cave");
-    
+    ResourceManager::Map    map    = ResourceManager::GetMap("cave");
+    ResourceManager::Sprite sprite = ResourceManager::GetSprite("player");
+
     Camera2D camera = {};
     camera.zoom     = 2.f;
     camera.offset.x = Graphics::render_area.width / 2.f;
@@ -86,11 +84,17 @@ GameScene GameScene::Init()
     camera.target   = map.player_spawn_point;
 
 	b2WorldDef world_def = b2DefaultWorldDef();
-	world_def.gravity.y = PhysicsConstants::gravity;
+	world_def.gravity.y  = PhysicsConstants::gravity;
+	b2WorldId world      = b2CreateWorld(&world_def);
+
+    Player               player         = Player::Init(sprite, map.player_spawn_point);
+    Physics::ObjectsTable physics_table = Physics::CreatePhysicsBodies(*map.map, world);
 
     return {
-        .map    = map,
-        .camera = camera,
-	    .world  = b2CreateWorld(&world_def),
+        .map            = map,
+        .camera         = camera,
+        .player         = player, 
+        .world          = world,
+        .physics_table  = std::move(physics_table),
     };
 }
