@@ -25,6 +25,7 @@ bool ResourceManager::LoadResources()
             "hitbox_1",
         },
     };
+
     bool loaded = LoadSprite(std::move(player_sprite), "player");
     if (loaded == false)
         return false;
@@ -58,7 +59,7 @@ ResourceManager::Map ResourceManager::GetMap(const std::string &map_name)
         Map     map            = {};
         TmxMap *tmx_map        = map_table.at(map_name);
         map.map                = tmx_map;
-        map.player_spawn_point = Tilemap::GetPlayerSpawnPosition(tmx_map);
+        map.player_spawn_point = Tilemap::GetPlayerSpawnPosition(*tmx_map);
         return map;
     } catch(std::exception &ex) {
         TraceLog(LOG_ERROR, ex.what());
