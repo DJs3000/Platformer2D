@@ -674,6 +674,11 @@ RAYTMX_DEC void TraceLogTMX(int logLevel, const TmxMap* map);
  */
 RAYTMX_DEC void SetTraceLogFlagsTMX(int logFlags);
 
+RAYTMX_DEC bool IterateTileLayer(const TmxMap* map, const TmxTileLayer* layer, Rectangle screenRect, uint32_t* rawGid,
+                                 TmxTile* tile, Rectangle* tileRect);
+
+RAYTMX_DEC uint32_t GetGid(uint32_t rawGid, bool* isFlippedHorizontally, bool* isFlippedVertically, bool* isFlippedDiagonally, bool* isRotatedHexagonal120);
+
 #ifdef __cplusplus
     }
 #endif /* __cplusplus */
@@ -834,8 +839,6 @@ void FreeTileset(TmxTileset tileset);
 void FreeProperty(TmxProperty property);
 void FreeLayer(TmxLayer layer);
 void FreeObject(TmxObject object);
-bool IterateTileLayer(const TmxMap* map, const TmxTileLayer* layer, Rectangle screenRect, uint32_t* rawGid,
-    TmxTile* tile, Rectangle* tileRect);
 void DrawTMXTileLayer(const TmxMap* map, Rectangle screenRect, TmxLayer layer, int posX, int posY, Color tint);
 void DrawTMXLayerTile(const TmxMap* map, Rectangle screenRect, uint32_t rawGid, int posX, int posY, Color tint);
 void DrawTMXObjectTile(const TmxMap* map, Rectangle screenRect, uint32_t rawGid, int posX, int posY, float width,
@@ -862,8 +865,6 @@ void AppendLayerTo(TmxMap* map, RaytmxLayerNode* groupNode, RaytmxLayerNode* lay
 RaytmxCachedTextureNode* LoadCachedTexture(RaytmxState* raytmxState, const char* fileName);
 RaytmxCachedTemplateNode* LoadCachedTemplate(RaytmxState* raytmxState, const char* fileName);
 Color GetColorFromHexString(const char* hex);
-uint32_t GetGid(uint32_t rawGid, bool* isFlippedHorizontally, bool* isFlippedVertically, bool* isFlippedDiagonally,
-    bool* isRotatedHexagonal120);
 void* MemAllocZero(unsigned int size);
 char* GetDirectoryPath2(const char* filePath);
 char* JoinPath(const char* prefix, const char* suffix);
@@ -3229,8 +3230,8 @@ int Clampi(int value, int minimum, int maximum) {
  * @param tileRect Optional output. The destination rectangle, in pixels, of the current tile. Pass NULL if not wanted.
  * @return True if the next tile is being provided via the output parameters, or false if iteration is done.
  */
-bool IterateTileLayer(const TmxMap* map, const TmxTileLayer* layer, Rectangle screenRect, uint32_t* rawGid,
-        TmxTile* tile, Rectangle* tileRect) {
+RAYTMX_DEC bool IterateTileLayer(const TmxMap* map, const TmxTileLayer* layer, Rectangle screenRect, uint32_t* rawGid,
+                                 TmxTile* tile, Rectangle* tileRect) {
     /* Static variables whose values will persist between calls. These are needed to initialize and iterate. */
     static const TmxTileLayer* currentLayer = NULL; /* Tile layer being iterated */
     static int fromX = 0; /* Initial X position, tile not pixel, that row-by-row iteration begins at */
@@ -4584,7 +4585,7 @@ Color GetColorFromHexString(const char* hex) {
     return color;
 }
 
-uint32_t GetGid(uint32_t rawGid, bool* isFlippedHorizontally, bool* isFlippedVertically, bool* isFlippedDiagonally,
+RAYTMX_DEC uint32_t GetGid(uint32_t rawGid, bool* isFlippedHorizontally, bool* isFlippedVertically, bool* isFlippedDiagonally,
         bool* isRotatedHexagonal120) {
     /* If the output parameters can be written to, output the status of the flip flags */
     if (isFlippedHorizontally != NULL)

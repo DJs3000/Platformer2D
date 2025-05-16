@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="8" nextobjectid="41">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="32" tileheight="32" infinite="0" nextlayerid="10" nextobjectid="75">
  <tileset firstgid="1" source="cave.tsx"/>
  <tileset firstgid="1025" source="physics_objects.tsx"/>
  <imagelayer id="2" name="background" offsetx="-1.13687e-13" offsety="-10.7598" repeatx="1">
@@ -14,7 +14,7 @@
  <imagelayer id="6" name="background_4" repeatx="1">
   <image source="background4b.png" width="960" height="480"/>
  </imagelayer>
- <layer id="1" name="Tile Layer 1" width="30" height="20">
+ <layer id="1" name="foreground" width="30" height="20">
   <data encoding="csv">
 464,464,464,464,464,464,464,464,464,464,464,464,464,464,464,464,464,464,464,464,464,464,464,464,464,464,464,464,464,464,
 99,101,0,0,0,0,0,0,0,0,0,0,98,0,0,0,0,0,0,0,0,0,98,0,0,0,0,0,0,0,
@@ -41,55 +41,7 @@
  <objectgroup color="#00ff00" id="3" name="player">
   <object id="1" name="player" x="48.4696" y="239.601"/>
  </objectgroup>
- <objectgroup id="7" name="boxes">
-  <object id="19" gid="1025" x="113" y="358.5" width="32" height="32">
-   <properties>
-    <property name="collision" type="bool" value="true"/>
-    <property name="static" type="bool" value="true"/>
-   </properties>
-  </object>
-  <object id="20" gid="1025" x="145.5" y="359" width="32" height="32">
-   <properties>
-    <property name="collision" type="bool" value="true"/>
-    <property name="static" type="bool" value="true"/>
-   </properties>
-  </object>
-  <object id="22" gid="1025" x="195" y="360" width="32" height="32">
-   <properties>
-    <property name="collision" type="bool" value="true"/>
-    <property name="static" type="bool" value="true"/>
-   </properties>
-  </object>
-  <object id="23" gid="1025" x="234" y="356.5" width="32" height="32">
-   <properties>
-    <property name="collision" type="bool" value="true"/>
-    <property name="static" type="bool" value="true"/>
-   </properties>
-  </object>
-  <object id="24" gid="1025" x="264.5" y="357" width="32" height="32">
-   <properties>
-    <property name="collision" type="bool" value="true"/>
-    <property name="static" type="bool" value="true"/>
-   </properties>
-  </object>
-  <object id="25" gid="1025" x="295.5" y="357" width="32" height="32">
-   <properties>
-    <property name="collision" type="bool" value="true"/>
-    <property name="static" type="bool" value="true"/>
-   </properties>
-  </object>
-  <object id="26" gid="1025" x="335" y="351.5" width="32" height="32">
-   <properties>
-    <property name="collision" type="bool" value="true"/>
-    <property name="static" type="bool" value="true"/>
-   </properties>
-  </object>
-  <object id="27" gid="1025" x="381" y="354.5" width="32" height="32">
-   <properties>
-    <property name="collision" type="bool" value="true"/>
-    <property name="static" type="bool" value="true"/>
-   </properties>
-  </object>
+ <objectgroup id="7" name="dynamic_bodies">
   <object id="28" gid="1025" x="151" y="113" width="32" height="32">
    <properties>
     <property name="collision" type="bool" value="true"/>
@@ -166,6 +118,13 @@
    <properties>
     <property name="collision" type="bool" value="true"/>
     <property name="static" type="bool" value="false"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup id="9" name="static_bodies">
+  <object id="71" x="1" y="320" width="960.5" height="30.5">
+   <properties>
+    <property name="collision" type="bool" value="true"/>
    </properties>
   </object>
  </objectgroup>

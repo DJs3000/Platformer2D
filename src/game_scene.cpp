@@ -13,11 +13,12 @@
 
 namespace {
     struct GameScene {
-        ResourceManager::Map       map    = {};
-        Camera2D                   camera = {};
-        std::unique_ptr<Player>    player = {};
-        b2WorldId                  world  = {};
-        std::vector<Physics::Body> bodies = {};
+        ResourceManager::Map       map           = {};
+        Camera2D                   camera        = {};
+        std::unique_ptr<Player>    player        = {};
+        b2WorldId                  world         = {};
+        Physics::ObjectsTable      physics_table = {};
+        bool                       debug_draw    = {};
 
         [[nodiscard]] static GameScene Init();
          
@@ -25,17 +26,16 @@ namespace {
         static void Update(GameScene &scene);
         static void Draw(const GameScene &scene);
     };
-
-    void DrawFloor();
 }
 
 Scenes::Message Scenes::RunGameScene()
 {
     GameScene scene = GameScene::Init();
     ResourceManager::Sprite sprite = ResourceManager::GetSprite("player");
-    scene.player  = std::make_unique<Player>();
-    *scene.player = Player::Init(sprite, scene.map.player_spawn_point, scene.camera);
-    scene.bodies  = Physics::InitObjects(Tilemap::GetObjectGroupFromLayer(scene.map.map, "boxes"), scene.world);
+    scene.player        = std::make_unique<Player>();
+    *scene.player       = Player::Init(sprite, scene.map.player_spawn_point, scene.camera);
+    scene.physics_table = Physics::CreatePhysicsBodies(*scene.map.map, scene.world);
+
     while(!WindowShouldClose()) {
         GameScene::ProcessEvents(scene);
         GameScene::Update(scene);
@@ -47,16 +47,19 @@ Scenes::Message Scenes::RunGameScene()
 
 void GameScene::ProcessEvents(GameScene &scene)
 {
+    if (IsKeyDown(KEY_LEFT_SHIFT) == true) {
+        if (IsKeyPressed(KEY_TWO) == true)
+            scene.debug_draw = !scene.debug_draw;
+    }
     Player::ProcessEvents(*scene.player);    
 }
 
 void GameScene::Update(GameScene &scene)
 {
-    constexpr int steps = 4;
+    constexpr int steps = 4; 
     b2World_Step(scene.world, GetFrameTime(), steps);
     Player::Update(*scene.player);
-    TmxObjectGroup group = Tilemap::GetObjectGroupFromLayer(scene.map.map, "boxes");
-    Physics::Update(scene.bodies, group);
+    Physics::Update(*scene.map.map, scene.physics_table);
 }
 
 void GameScene::Draw(const GameScene &scene)
@@ -66,7 +69,8 @@ void GameScene::Draw(const GameScene &scene)
             ClearBackground(BLACK);
             DrawTMX(scene.map.map, &scene.camera, 0, 0, WHITE);
             Player::Draw(*scene.player);
-            Graphics::DrawDebugPhysicsEdges(scene.bodies);
+            if (scene.debug_draw)
+                Graphics::DrawDebugPhysics(scene.physics_table);
         EndMode2D();
     Graphics::EndRender();
 }
@@ -89,16 +93,4 @@ GameScene GameScene::Init()
         .camera = camera,
 	    .world  = b2CreateWorld(&world_def),
     };
-}
-namespace {
-    void DrawFloor()
-    {
-        constexpr Rectangle floor_rect = {
-            .x = 0,
-            .y = Graphics::render_area.height / 2,
-            .width = Graphics::render_area.width,
-            .height = Graphics::render_area.height / 2,
-        };
-        DrawRectangleRec(floor_rect, GREEN);
-    }
 }

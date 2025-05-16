@@ -16,5 +16,5 @@ namespace Graphics {
     void BeginRender() noexcept;
     void EndRender() noexcept;
 
-    void DrawDebugPhysicsEdges(const std::vector<Physics::Body> &bodies);
+    void DrawDebugPhysics(const Physics::ObjectsTable &table);
 }
