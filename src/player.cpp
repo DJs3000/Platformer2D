@@ -18,7 +18,6 @@ void Player::ProcessEvents(Player &player)
         }
         player.dir = Direction::LEFT;
         player.pos.x -= 45 * GetFrameTime();
-//        player.camera->target.x -= 45 * GetFrameTime();
     } else if (IsKeyReleased(KEY_A) == true) {
         player.state       = State::IDLE;
         player.current_tag = player.sprite.tags["Idle"]; 
@@ -31,7 +30,6 @@ void Player::ProcessEvents(Player &player)
         }
         player.dir = Direction::RIGHT;
         player.pos.x += 45 * GetFrameTime();
-//        player.camera->target.x += 45 * GetFrameTime();
     } else if (IsKeyReleased(KEY_D) == true) {
         player.state = State::IDLE;
         player.current_tag = player.sprite.tags["Idle"];
@@ -48,11 +46,11 @@ void Player::Draw(const Player &player)
     const bool      horizontal_flip = player.dir == Direction::LEFT ? true : false;
     Rectangle       rect            = player.sprite.slices.at("hitbox_1").bounds;
     
-    if (horizontal_flip == true) {
+    if (horizontal_flip == true)
         rect.x = (rect.x + player.pos.x) + rect.width / 2;
-    } else {
+    else
         rect.x += player.pos.x;
-    }
+
     rect.y += player.pos.y;
 
     DrawAsepriteTagVFlipped(player.current_tag, player.pos, horizontal_flip, false, WHITE);

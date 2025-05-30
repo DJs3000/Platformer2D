@@ -14,7 +14,7 @@
 
 namespace {
     struct GameScene {
-        ResourceManager::Map  map           = {};
+        TmxMap                map           = {};
         Camera2D              camera        = {};
         Player                player        = {};
         b2WorldId             world         = {};
@@ -52,11 +52,12 @@ void GameScene::ProcessEvents(GameScene &scene)
 
 void GameScene::Update(GameScene &scene)
 {
-    constexpr int steps = 4; 
+    constexpr int steps     = 4; 
+    const float   map_width = static_cast<float>(scene.map.tileWidth * scene.map.width);
     b2World_Step(scene.world, GetFrameTime(), steps);
     Player::Update(scene.player);
-    Physics::Update(*scene.map.map, scene.physics_table);
-    UpdateCamera2D(scene.camera, scene.player.pos, scene.map.map->tileWidth * scene.map.map->width);
+    Physics::Update(scene.map, scene.physics_table);
+    UpdateCamera2D(scene.camera, scene.player.pos, map_width);
 }
 
 void GameScene::Draw(const GameScene &scene)
@@ -64,7 +65,7 @@ void GameScene::Draw(const GameScene &scene)
     Graphics::BeginRender();
         BeginMode2D(scene.camera);
             ClearBackground(BLACK);
-            DrawTMX(scene.map.map, &scene.camera, 0, 0, WHITE);
+            DrawTMX(&scene.map, &scene.camera, 0, 0, WHITE);
             Player::Draw(scene.player);
             if (scene.debug_draw)
                 Graphics::DrawDebugPhysics(scene.physics_table);
@@ -74,21 +75,21 @@ void GameScene::Draw(const GameScene &scene)
 
 GameScene GameScene::Init()
 {
-    ResourceManager::Map    map    = ResourceManager::GetMap("cave");
+    TmxMap                  map    = ResourceManager::GetMap("cave");
     ResourceManager::Sprite sprite = ResourceManager::GetSprite("player");
 
     Camera2D camera = {};
     camera.zoom     = 2.f;
     camera.offset.x = Graphics::render_area.width / 2.f;
     camera.offset.y = Graphics::render_area.height / 2.f;
-    camera.target   = map.player_spawn_point;
+    camera.target   = Tilemap::GetPlayerSpawnPosition(map);
 
 	b2WorldDef world_def = b2DefaultWorldDef();
 	world_def.gravity.y  = PhysicsConstants::gravity;
 	b2WorldId world      = b2CreateWorld(&world_def);
 
-    Player               player         = Player::Init(sprite, map.player_spawn_point);
-    Physics::ObjectsTable physics_table = Physics::CreatePhysicsBodies(*map.map, world);
+    Player                player        = Player::Init(sprite, Tilemap::GetPlayerSpawnPosition(map));
+    Physics::ObjectsTable physics_table = Physics::CreatePhysicsBodies(map, world);
 
     return {
         .map            = map,
