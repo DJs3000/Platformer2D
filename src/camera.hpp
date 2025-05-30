@@ -1,9 +1,9 @@
 #pragma once
 #include "graphics.hpp"
 
-void UpdateCamera2D(Camera2D &camera, const Vector2 &target_position, const int map_width)
+void UpdateCamera2D(Camera2D &camera, const Vector2 &target_position, const float map_width)
 {
-    constexpr int offset = 320;
+    constexpr float offset = 320;
     if (target_position.x - offset <= 0) {
         camera.target.x = offset;
         return;

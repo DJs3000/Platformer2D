@@ -570,8 +570,11 @@ b2DistanceOutput b2ShapeDistance( const b2DistanceInput* input, b2SimplexCache* 
 	// Prepare output
 	b2Vec2 normal = b2Normalize( nonUnitNormal );
 	normal = b2RotateVector( input->transformA.q, normal );
+    
+    // To stop gcc bitching about maybe initialized variables
+	b2Vec2 localPointA = {0};
+    b2Vec2 localPointB = {0};
 
-	b2Vec2 localPointA, localPointB;
 	b2ComputeSimplexWitnessPoints( &localPointA, &localPointB, &simplex );
 	output.normal = normal;
 	output.distance = b2Distance( localPointA, localPointB );

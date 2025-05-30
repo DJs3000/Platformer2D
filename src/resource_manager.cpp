@@ -53,14 +53,11 @@ ResourceManager::Sprite ResourceManager::GetSprite(const std::string &resource_n
     }
 }
 
-ResourceManager::Map ResourceManager::GetMap(const std::string &map_name)
+TmxMap ResourceManager::GetMap(const std::string &map_name)
 {
     try {
-        Map     map            = {};
-        TmxMap *tmx_map        = map_table.at(map_name);
-        map.map                = tmx_map;
-        map.player_spawn_point = Tilemap::GetPlayerSpawnPosition(*tmx_map);
-        return map;
+        TmxMap *tmx_map = map_table.at(map_name);
+        return *tmx_map;
     } catch(std::exception &ex) {
         TraceLog(LOG_ERROR, ex.what());
         return {}; 
